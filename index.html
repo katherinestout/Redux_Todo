@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Mini Redux To-do</title>
+</head>
+<body>
+    <input id = "todo" type="text">
+    <button id ="submit-todo">Submit</button>
+    <div id="container"></div>
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/redux/3.7.2/redux.min.js'></script>
+<script> 
+//create reducer
+const reducer = Redux.combineReducers({
+    //functions run whenever dispatch is called
+    //return value is apps new state
+    todos: (state = [], action) => {
+        //new copy of state
+        const newState = Object.assign([], state);
+
+        if (action.type == 'add'){
+            newState.push(action.item);
+        }
+        if(action.type == 'remove'){
+            newState.splice(action.index, 1);
+        }
+        return newState;
+    }
+});
+
+//create store, pass in reducer
+//can access state/ dispatch events
+//can get state of data
+
+const store = Redux.createStore(reducer);
+
+const render = () => {
+
+    const container = document.getElementById('container');
+    container.innerHTML = '';
+    const state = store.getState();
+
+    state.todos.forEach((todo, i) => {
+    const e = document.createElement('div');
+    e.innerHTML = todo;
+    container.appendChild(e);
+
+    //delete action, when user clicks on item it deletes
+    e.onclick = () => {
+        store.dispatch({
+            type: 'remove',
+            index: i
+        });
+        //refresh UI
+        render();
+    }
+});
+};
+
+//update state when submit button is clicked
+document.getElementById('submit-todo').onclick = () => {
+    //to update state call dispatch function and pass in object
+    store.dispatch({
+        type: 'add',
+        item: document.getElementById('todo').value
+    });
+    render();
+};
+//then will update execute and get new state
+
+Window.store = store;
+
+
+</script>
+
+</body>
+</html>
